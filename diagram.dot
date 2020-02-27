@@ -1,0 +1,72 @@
+digraph G {
+    antenna [shape=ellipse];
+
+    subgraph cluster0 {
+        node [style=filled,color=white];
+        color=blue;
+
+        subgraph cluster6 {
+            node [style=filled, shape=box, style=filled, color=lightgrey];
+            LoRa [label = "RFM95 transceiver"];
+            labeljust = l;
+            color=lightgrey;
+            label = "LoRa module";
+        }
+
+        antenna -> LoRa [dir=both]
+        LoRa -> LoRaSR [dir=both,label = "SPI"];
+
+        subgraph cluster2 {
+            node [style=filled, shape=box, style=filled, color=lightgrey];
+            SDfiles [label = "Static Web App\n\n Vector Map Tiles"];
+            labeljust = l;
+            color=lightgrey;
+            label = "SD card file system";
+        }
+
+        subgraph cluster1 {
+            node [style=filled,color=white];
+            style=filled;
+            color=lightgrey;
+            subgraph cluster3 {
+                node [style=filled,color=white];
+                color=red;
+                LoRaSR [label = "LoRa send/receive"];
+                WebServer [label = "Web Server"];
+                LoRaSR -> WebServer [dir=both];
+                labeljust = l;
+                label = "firmware";
+            }
+            FS -> WebServer;
+            subgraph cluster4 {
+                node [style=filled,color=white];
+                color=green;
+                FS [label = "Static Web App"];
+                labeljust = l;
+                label = "on-board file system"
+            }
+            WiFiAntenna [label="WiFi Antenna",shape=box,style=filled,color=blue];
+            labeljust = l;
+            label = "ESP8266";
+        }
+        SDfiles -> WebServer [dir=both,label = "SPI"]; 
+        WebServer -> WiFiAntenna;
+        label = "disaster.node1";
+    }
+    WiFiAntenna -> JS [dir=both, label="websocket connection"];
+    subgraph cluster5 {
+        node [style=filled,color=white];
+        color=yellow;
+        JS [shape=none,label = "Running Web App"]
+        JS -> maps [dir=both];
+        JS -> apps [dir=both];
+        JS -> chat [dir=both];
+        label = "client device"
+    }
+
+    disasternode2 [label = "disaster.node2", shape = "box", color = blue]
+
+    antenna -> disasternode2 
+    disasternode2 -> antenna [label = "900MHz RF"];
+
+}
